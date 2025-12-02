@@ -1,11 +1,14 @@
 import sys
 from spellscript import SpellScriptInterpreter
 
+import argparse
+
+parser = argparse.ArgumentParser(description="Spellscript interpreter")
+parser.add_argument("filename", type=str, help="the spell to execute")
+
 def main():
-    if len(sys.argv) < 2:
-        print("usage: python spellscript.py <filename>.spell")
-        sys.exit(1)
-    with open(sys.argv[1], 'r') as f:
+    args = parser.parse_args()
+    with open(args.filename, 'r') as f:
         text = f.read()
     interp = SpellScriptInterpreter()
     try:
