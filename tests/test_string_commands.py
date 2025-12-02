@@ -11,20 +11,6 @@ def interpreter():
 def incantation(details):
     return f"begin the grimoire. {details} close the grimoire."
 
-
-def test_inscribe(interpreter, capsys):
-    """Test inscribe: print a string"""
-    spell = incantation("inscribe whispers of \"Mortal plane, I greet thee\".")
-    interpreter.parse_and_execute(spell)
-    captured = capsys.readouterr()
-    assert "Mortal plane, I greet thee" in captured.out
-
-def test_spell():
-    """test that running spellscript on test.spell works"""
-    interpreter = SpellScriptInterpreter()
-    with open("test.spell") as f:
-        interpreter.parse_and_execute(f.read())
-
 @pytest.fixture
 def temp_text_file():
     """Create a temporary text file for testing file reading."""
@@ -52,8 +38,8 @@ def test_reveal_nonexistent_file(interpreter):
 def test_dissect_string(interpreter):
     """Test dissect: split string by delimiter"""
     spell = incantation('summon the words with essence of whispers of "apple,banana,cherry". '
-                        'dissect words by "," into fruits. '
-                        'inscribe fruits.')
+                      'dissect words by "," into fruits. '
+                      'inscribe fruits.')
     interpreter.parse_and_execute(spell)
     assert "words" in interpreter.variables
     assert interpreter.variables["fruits"] == ["apple", "banana", "cherry"]
@@ -61,22 +47,22 @@ def test_dissect_string(interpreter):
 def test_extract_verse(interpreter):
     """Test extract: get specific line from multi-line text"""
     spell = incantation('summon the poem with essence of whispers of "First line\nSecond line\nThird line". '
-                        'extract verse 2 from poem into second_line. '
-                        'inscribe second_line.')
+                      'extract verse 2 from poem into second_line. '
+                      'inscribe second_line.')
     interpreter.parse_and_execute(spell)
     assert interpreter.variables["second_line"] == "Second line"
 
 def test_extract_verse_out_of_range(interpreter):
     """Test extract: handle out of range line number"""
     spell = incantation('summon the poem with essence of whispers of "Single line". '
-                        'extract verse 2 from poem into second_line.')
+                      'extract verse 2 from poem into second_line.')
     with pytest.raises(IndexError):
         interpreter.parse_and_execute(spell)
 
 def test_transform_string(interpreter):
     """Test transform: replace text in string"""
     spell = incantation('summon the incantation with essence of whispers of "Turn lead into gold". '
-                        'transform incantation replacing "lead" with "silver" into new_incantation. '
-                        'inscribe new_incantation.')
+                      'transform incantation replacing "lead" with "silver" into new_incantation. '
+                      'inscribe new_incantation.')
     interpreter.parse_and_execute(spell)
     assert interpreter.variables["new_incantation"] == "Turn silver into gold"

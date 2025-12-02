@@ -1,0 +1,65 @@
+begin the grimoire.
+
+inscribe whispers of "SPELLSCRIPT STRING MANIPULATION DEMO".
+inscribe whispers of "====================================".
+
+inscribe whispers of "Creating a temporary file for demonstration...".
+summon the text with essence of whispers of "This is line 1
+This is line 2
+This is line 3
+apple,orange,banana,grape
+The wizard's quest: turn lead into gold".
+
+inscribe whispers of "Original text:".
+inscribe text.
+
+inscribe whispers of "".
+inscribe whispers of "1. EXTRACTING LINES:".
+extract verse 1 from text into first_line.
+inscribe whispers of "First line:".
+inscribe first_line.
+
+extract verse 3 from text into third_line.
+inscribe whispers of "Third line:".
+inscribe third_line.
+
+inscribe whispers of "".
+inscribe whispers of "2. SPLITTING TEXT:".
+extract verse 4 from text into fruits_line.
+inscribe whispers of "Fruits line:".
+inscribe fruits_line.
+
+dissect fruits_line by "," into fruits.
+inscribe whispers of "Fruits array:".
+inscribe fruits.
+
+inscribe whispers of "".
+inscribe whispers of "3. TEXT TRANSFORMATION:".
+extract verse 5 from text into quest.
+inscribe whispers of "Original quest:".
+inscribe quest.
+
+transform quest replacing "lead" with "silver" into new_quest.
+inscribe whispers of "Modified quest:".
+inscribe new_quest.
+
+inscribe whispers of "".
+inscribe whispers of "4. COMBINING OPERATIONS:".
+summon the file_path with essence of whispers of "temp_demo.txt".
+
+inscribe whispers of "Writing text to temporary file...".
+summon the command with essence of whispers of "echo 'Hello from a file!' > temp_demo.txt".
+ponder for 1 moments.
+
+reveal knowledge from "temp_demo.txt" into file_content.
+inscribe whispers of "File content:".
+inscribe file_content.
+
+transform file_content replacing "Hello" with "Greetings" into transformed_content.
+inscribe whispers of "Transformed content:".
+inscribe transformed_content.
+
+inscribe whispers of "".
+inscribe whispers of "Demo completed successfully!".
+
+close the grimoire.
