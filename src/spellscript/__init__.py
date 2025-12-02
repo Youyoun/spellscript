@@ -1,0 +1,1 @@
+from .spellscript import SpellScriptInterpreter
