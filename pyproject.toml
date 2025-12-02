@@ -1,0 +1,17 @@
+[project]
+name = "spellscript"
+version = "0.1.0"
+description = "An esoteric programming language where code reads like magical incantations from an ancient spellbook."
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = []
+
+[dependency-groups]
+test = ["pytest"]
+
+[project.scripts]
+spellscript = "spellscript.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.13,<0.10.0"]
+build-backend = "uv_build"
