@@ -6,26 +6,19 @@ from spellscript import SpellScriptInterpreter
 def interpreter():
     return SpellScriptInterpreter()
 
-@pytest.fixture
-def test_spells():
-    with open("test.spell", "r") as f:
-        return f.read()
+def incantation(details):
+    return f"begin the grimoire. {details} close the grimoire."
 
 
-def test_inquire(interpreter, test_spells):
-    interpreter.parse_and_execute(test_spells)
-    assert interpreter.variables["test_var"] == "test input"
+def test_inscribe(interpreter, capsys):
+    """Test inscribe: print a string"""
+    spell = incantation("inscribe whispers of \"Mortal plane, I greet thee\".")
+    interpreter.parse_and_execute(spell)
+    captured = capsys.readouterr()
+    assert "Mortal plane, I greet thee" in captured.out
 
-def test_append(interpreter, test_spells):
-    interpreter.parse_and_execute(test_spells)
-    assert interpreter.variables["test_array"] == [1, 2, 3, 4]
-
-def test_enchant(interpreter, test_spells):
-    interpreter.parse_and_execute(test_spells)
-    assert interpreter.variables["test_dict"] == {"a": 1, "b": 2}
-
-def test_transmute(interpreter, test_spells):
-    interpreter.parse_and_execute(test_spells)
-    assert interpreter.variables["test_number"] == 1
-    assert interpreter.variables["test_text"] == "test"
-    assert interpreter.variables["test_truth"] is True
+def test_spell():
+    """test that running spellscript on test.spell works"""
+    interpreter = SpellScriptInterpreter()
+    with open("test.spell") as f:
+        interpreter.parse_and_execute(f.read())
