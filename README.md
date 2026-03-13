@@ -11,7 +11,7 @@ an esoteric programming language where code reads like magical incantations from
 begin the grimoire.
 summon the power with essence of 7.
 conjure ritual named amplify with value to return value multiplied by value.
-enchant power with essence 0 of through ritual amplify with power.
+enchant power through ritual amplify with power.
 inscribe whispers of "the power is amplified: " bound with power.
 close the grimoire.
 ```
@@ -23,19 +23,23 @@ close the grimoire.
 - variables
 - dynamic typing
 - arrays
-- functions
+- functions (with recursion support)
 - conditionals/loops
-- string manipulation
+- string manipulation (split, extract, replace, regex)
+- file reading
 - type conversion
 - user input
 - output
+- command-line arguments (`scrolls`)
 
 
-## run ts
+## run it
 1. clone thy repo
-2. make sure you have python 3.6 +
-3. create a file called `<filename>.spell`:
-4. then run `python spellscript.py your-spell.spell`
+2. make sure you have python 3.6+
+3. create a file called `<filename>.spell`
+4. then run `python cli.py your-spell.spell [arguments...]`
+
+extra arguments are available inside the spell as the `scrolls` array.
 
 ## overview
 
@@ -62,6 +66,7 @@ close the grimoire.
 | subtraction | `a lesser by b` | `a - b` |
 | multiplication | `a multiplied by b` | `a * b` |
 | division | `a divided by b` | `a / b` |
+| modulo | `a residue of b` | `a % b` |
 | equals | `a equals b` | `a == b` |
 | greater than | `a greater than b` | `a > b` |
 | less than | `a less than b` | `a < b` |
@@ -69,19 +74,28 @@ close the grimoire.
 | or | `a or b` | `a or b` |
 | not | `not a` | `not a` |
 
+### string operations
+
+| operation | spellscript | traditional |
+|-----------|-------------|-------------|
+| split | `dissect x by "," into parts` | `parts = x.split(",")` |
+| get line | `extract verse 2 from x into line` | `line = x.splitlines()[1]` |
+| replace | `transform x replacing "a" with "b" into y` | `y = x.replace("a", "b")` |
+| regex | `decipher x with pattern "(\w+)" into match` | `match = re.match(r"(\w+)", x)` |
+| read file | `reveal knowledge from "file.txt" into data` | `data = open("file.txt").read()` |
+
 ## →→→ documentation ←←←
 
 - resources/documentation.md - feature documentation
-- resources/examples - example programs
+- examples/ - example programs (fibonacci, factorial, file reading)
 
 ## limitations (totally intentional btw)
 
 - no nested arrays
 - no string indexing (use character arrays)
-- no modulo operator
 - no break/continue in loops
 - no comments
-- no recursion (use iteration)
+- deeply recursive rituals may exceed python's stack limit
 - functions must have at least one parameter
 - no null concept
 
