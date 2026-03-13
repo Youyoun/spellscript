@@ -1,0 +1,7 @@
+begin the grimoire.
+
+reveal knowledge from scrolls at position 0 into tome.
+inscribe whispers of "The tome contains:".
+inscribe tome.
+
+close the grimoire.

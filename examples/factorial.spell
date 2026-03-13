@@ -1,0 +1,15 @@
+begin the grimoire.
+
+conjure ritual named factorial with n to begin:
+    if the signs show n less than 2 then return 1.
+    return n multiplied by through ritual factorial with n lesser by 1.
+end ritual.
+
+inscribe whispers of "Factorials (recursive):".
+summon the idx with essence of 1.
+repeat the incantation 10 times to begin:
+    inscribe idx bound with whispers of "! = " bound with through ritual factorial with idx.
+    enchant idx with idx greater by 1.
+end loop.
+
+close the grimoire.

@@ -1,0 +1,15 @@
+begin the grimoire.
+
+conjure ritual named fibonacci with n to begin:
+    if the signs show n less than 2 then return n.
+    return through ritual fibonacci with n lesser by 1 greater by through ritual fibonacci with n lesser by 2.
+end ritual.
+
+inscribe whispers of "Fibonacci sequence:".
+summon the idx with essence of 0.
+repeat the incantation 15 times to begin:
+    inscribe idx bound with whispers of ": " bound with through ritual fibonacci with idx.
+    enchant idx with idx greater by 1.
+end loop.
+
+close the grimoire.

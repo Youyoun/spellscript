@@ -649,6 +649,7 @@ class SpellScriptInterpreter:
     _ARITHMETIC_OPS = [
         ("multiplied by", operator.mul),
         ("divided by", None),
+        ("residue of", operator.mod),
         ("greater by", operator.add),
         ("lesser by", operator.sub),
     ]
@@ -701,7 +702,15 @@ class SpellScriptInterpreter:
                 ritual_call = name
                 if args:
                     ritual_call += " with " + args
-                return self.evaluate_ritual_call(ritual_call)
+                result = self.evaluate_ritual_call(ritual_call)
+
+                remaining = expr[:match.start()] + str(result) + expr[match.end():]
+                remaining = remaining.strip()
+
+                if remaining and remaining != str(result):
+                    return self.evaluate_expression(remaining)
+
+                return result
 
         if "invoke the ritual" in expr_lower:
             pattern = r'invoke the ritual (\w+)(?: with (.+))?'
@@ -768,12 +777,19 @@ class SpellScriptInterpreter:
         return expr
 
     def handle_reveal(self, statement):
-        pattern = r'Reveal knowledge from "([^"]+)" into (\w+)'
-        match = re.match(pattern, statement, re.IGNORECASE)
-        if not match:
-            raise SyntaxError('use Reveal knowledge from "path/to/file" into <variable>')
+        pattern_quoted = r'Reveal knowledge from "([^"]+)" into (\w+)'
+        pattern_expr = r'Reveal knowledge from (.+?) into (\w+)'
+        match = re.match(pattern_quoted, statement, re.IGNORECASE)
+        if match:
+            filepath = match.group(1)
+        else:
+            match = re.match(pattern_expr, statement, re.IGNORECASE)
+            if not match:
+                raise SyntaxError('use Reveal knowledge from "path/to/file" into <variable>')
+            filepath = self.evaluate_expression(match.group(1).strip())
+            if not isinstance(filepath, str):
+                raise TypeError("file path must be text")
 
-        filepath = match.group(1)
         var_name = match.group(2)
 
         try:
