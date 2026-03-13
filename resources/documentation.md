@@ -1,8 +1,8 @@
 # spellscript documentation
 
-**version:** 1.0  
-**author:** sirbread  
-**last updated:** 2025-10-11
+**version:** 1.1
+**author:** sirbread
+**last updated:** 2026-03-13
 
 ---
 
@@ -22,10 +22,12 @@
 12. [string operations](#string-operations)
 13. [type conversion](#type-conversion)
 14. [input/output](#inputoutput)
-15. [utility commands](#utility-commands)
-16. [language behavior](#language-behavior)
-17. [limitations](#limitations)
-18. [syntax quick reference](#syntax-quick-reference)
+15. [file operations](#file-operations)
+16. [utility commands](#utility-commands)
+17. [command-line arguments](#command-line-arguments)
+18. [language behavior](#language-behavior)
+19. [limitations](#limitations)
+20. [syntax quick reference](#syntax-quick-reference)
 
 ---
 
@@ -33,12 +35,26 @@
 
 ### installation
 
-save the interpreter as `spellscript.py` and ensure python 3.6+ is installed.
+install the package and ensure python 3.6+ is installed.
 
 ### running a spell
 
 ```bash
-python spellscript.py filename.spell
+python cli.py filename.spell [arguments...]
+```
+
+### passing arguments
+
+extra arguments are available inside the spell as the `scrolls` array:
+
+```bash
+python cli.py my_spell.spell input.txt output.txt
+```
+
+```spellscript
+begin the grimoire.
+reveal knowledge from scrolls at position 0 into data.
+close the grimoire.
 ```
 
 ### hello world
@@ -232,7 +248,12 @@ see [arrays](#arrays) section.
 <a> divided by <b>
 ```
 
-**chaining:** 
+**modulo:**
+```
+<a> residue of <b>
+```
+
+**chaining:**
 ```spellscript
 summon the result with essence of 2 greater by 3 multiplied by 4.
 ```
@@ -478,6 +499,19 @@ conjure ritual named findmax with arr to begin:
 end ritual.
 ```
 
+### recursion
+
+rituals support recursive calls. a ritual can call itself:
+
+```spellscript
+conjure ritual named factorial with n to begin:
+    if the signs show n less than 2 then return 1.
+    return n multiplied by through ritual factorial with n lesser by 1.
+end ritual.
+```
+
+**note:** deeply recursive calls (e.g. naive recursive fibonacci) may exceed python's stack limit. prefer iterative approaches for deep recursion.
+
 ### function parameters
 
 **functions must have at least one parameter.** use a dummy parameter for parameterless functions:
@@ -541,6 +575,69 @@ summon the combined with essence of whispers of "hello" bound with whispers of "
 summon the message with essence of whispers of "count: " bound with counter.
 ```
 
+### dissect (split)
+
+splits a string by a delimiter into an array.
+
+**syntax:**
+```
+dissect <variable> by "<delimiter>" into <result>.
+```
+
+**example:**
+```spellscript
+summon the csv with essence of whispers of "apple,banana,cherry".
+dissect csv by "," into fruits.
+```
+
+### extract (get line)
+
+extracts a specific line (1-indexed) from multi-line text.
+
+**syntax:**
+```
+extract verse <line_number> from <variable> into <result>.
+```
+
+**example:**
+```spellscript
+summon the poem with essence of whispers of "First line\nSecond line\nThird line".
+extract verse 2 from poem into second_line.
+```
+
+### transform (replace)
+
+replaces occurrences of text within a string.
+
+**syntax:**
+```
+transform <variable> replacing "<old>" with "<new>" into <result>.
+```
+
+**example:**
+```spellscript
+summon the text with essence of whispers of "Turn lead into gold".
+transform text replacing "lead" with "silver" into new_text.
+```
+
+### decipher (regex)
+
+extracts components from a string using a regex pattern.
+
+**syntax:**
+```
+decipher <variable> with pattern "<regex>" into <result1> [and <result2> and ...].
+```
+
+**examples:**
+```spellscript
+summon the entry with essence of whispers of "John:42".
+decipher entry with pattern "(\w+):(\d+)" into name and age.
+
+summon the greeting with essence of whispers of "Hello World".
+decipher greeting with pattern "(\w+) \w+" into first_word.
+```
+
 ---
 
 ## type conversion
@@ -600,6 +697,29 @@ inquire whispers of "enter your name:" into username.
 
 ---
 
+## file operations
+
+### reveal (read file)
+
+reads the contents of a file into a variable.
+
+**syntax:**
+```
+reveal knowledge from "<path>" into <variable>.
+reveal knowledge from <expression> into <variable>.
+```
+
+the path can be a quoted string literal or an expression (e.g. a variable or array element).
+
+**examples:**
+```spellscript
+reveal knowledge from "data.txt" into contents.
+
+reveal knowledge from scrolls at position 0 into contents.
+```
+
+---
+
 ## utility commands
 
 ### gaze upon (debug)
@@ -611,7 +731,7 @@ evaluates and prints a condition.
 gaze upon <condition>.
 ```
 
-**output format:** `gazing reveals: true` or `gazing reveals: false`
+**output format:** `Gazing reveals: True` or `Gazing reveals: False`
 
 ### ponder (delay)
 
@@ -627,6 +747,27 @@ ponder for <seconds> moments.
 summon the delay with essence of 0point5.
 ponder for delay moments.
 ```
+
+---
+
+## command-line arguments
+
+when running a spell from the command line, extra arguments are passed to the spell as the `scrolls` array.
+
+**usage:**
+```bash
+python cli.py my_spell.spell arg1 arg2 arg3
+```
+
+**accessing arguments inside the spell:**
+```spellscript
+begin the grimoire.
+summon the first with essence of scrolls at position 0.
+summon the count with essence of length of scrolls.
+close the grimoire.
+```
+
+all arguments are passed as strings. use `transmute` to convert to numbers if needed.
 
 ---
 
@@ -659,10 +800,9 @@ summon the result with essence of 2 greater by product.
 
 - no nested arrays, must use multiple separate arrays.
 - no string indexing, must use arrays of single character strings.
-- no modulo operator.
 - loops cannot be exited early (besides via function returns).
 - comments aren't supported (because the language is read like a book anyways).
-- recursive functions can be defined, use iterative approaches instead.
+- deeply recursive rituals may exceed python's stack limit; prefer iterative approaches for deep recursion.
 - use a dummy parameter for parameterless functions.
 
 ---
@@ -690,6 +830,11 @@ summon the result with essence of 2 greater by product.
 | return | `return <value>.` |
 | type conversion | `transmute <name> into <type>.` |
 | append | `append <value> to <array>.` |
+| read file | `reveal knowledge from "<path>" into <variable>.` |
+| split string | `dissect <variable> by "<delimiter>" into <result>.` |
+| get line | `extract verse <n> from <variable> into <result>.` |
+| replace text | `transform <variable> replacing "<old>" with "<new>" into <result>.` |
+| regex extract | `decipher <variable> with pattern "<regex>" into <results>.` |
 | delay | `ponder for <seconds> moments.` |
 | debug | `gaze upon <condition>.` |
 
@@ -716,8 +861,14 @@ summon the result with essence of 2 greater by product.
 | `return` | return value |
 | `transmute` | type conversion |
 | `append` | add to array |
+| `reveal` | read file |
+| `dissect` | split string |
+| `extract` | get line from text |
+| `transform` | replace text |
+| `decipher` | regex extract |
 | `ponder` | delay |
 | `gaze upon` | debug |
+| `scrolls` | CLI arguments |
 | `whispers of` | string literal |
 | `collection holding` | array literal |
 | `essence of` | value source |
@@ -729,6 +880,7 @@ summon the result with essence of 2 greater by product.
 | `lesser by` | subtraction |
 | `multiplied by` | multiplication |
 | `divided by` | division |
+| `residue of` | modulo |
 | `greater than` | comparison |
 | `less than` | comparison |
 | `equals` | equality |
