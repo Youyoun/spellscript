@@ -35,12 +35,16 @@
 
 ### installation
 
-install the package and ensure python 3.6+ is installed.
+install with uv as a tool:
+
+```bash
+uv tool install git+https://github.com/Youyoun/spellscript
+```
 
 ### running a spell
 
 ```bash
-python cli.py filename.spell [arguments...]
+spellscript filename.spell [arguments...]
 ```
 
 ### passing arguments
@@ -48,7 +52,7 @@ python cli.py filename.spell [arguments...]
 extra arguments are available inside the spell as the `scrolls` array:
 
 ```bash
-python cli.py my_spell.spell input.txt output.txt
+spellscript my_spell.spell input.txt output.txt
 ```
 
 ```spellscript

@@ -34,10 +34,16 @@ close the grimoire.
 
 
 ## run it
-1. clone thy repo
-2. make sure you have python 3.6+
-3. create a file called `<filename>.spell`
-4. then run `python cli.py your-spell.spell [arguments...]`
+
+**install with uv:**
+```bash
+uv tool install git+https://github.com/Youyoun/spellscript
+```
+
+then cast thy spells:
+```bash
+spellscript your-spell.spell [arguments...]
+```
 
 extra arguments are available inside the spell as the `scrolls` array.
 
