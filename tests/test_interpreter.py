@@ -80,3 +80,21 @@ def test_transform_string(interpreter):
                         'inscribe new_incantation.')
     interpreter.parse_and_execute(spell)
     assert interpreter.variables["new_incantation"] == "Turn silver into gold"
+
+def test_run(interpreter):
+    script = """
+    begin the grimoire.
+    conjure ritual named getgrade with score to begin:
+        if the signs show score greater than 90 then return whispers of "a".
+        if the signs show score greater than 80 then return whispers of "b".
+        if the signs show score greater than 70 then return whispers of "c".
+        return whispers of "f".
+    end ritual.
+    
+    inscribe whispers of "95 = " bound with through ritual getgrade with 95.
+    inscribe whispers of "75 = " bound with through ritual getgrade with 75.
+    close the grimoire.
+    """
+    interpreter.parse_and_execute(script)
+    assert interpreter.variables["95"] == "a"
+    assert interpreter.variables["75"] == "b"

@@ -232,7 +232,7 @@ see [arrays](#arrays) section.
 <a> divided by <b>
 ```
 
-**chaining:**
+**chaining:** 
 ```spellscript
 summon the result with essence of 2 greater by 3 multiplied by 4.
 ```

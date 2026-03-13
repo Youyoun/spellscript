@@ -11,6 +11,9 @@ class ExecutionContext:
         self.body_statements = body_statements or []
         self.current_index = start_index
 
+    def __repr__(self):
+        return f"ExecutionContext(source={self.source}, body_statements={self.body_statements}, current_index={self.current_index})"
+
 
 class SpellScriptInterpreter:
     def __init__(self):
@@ -97,6 +100,8 @@ class SpellScriptInterpreter:
             return self.handle_extract(statement)
         elif cmd == "transform":
             return self.handle_transform(statement)
+        elif cmd == "decipher":
+            return self.handle_decipher(statement)
         else:
             raise SyntaxError(f"unknown incantation {cmd}")
 
@@ -973,3 +978,36 @@ class SpellScriptInterpreter:
 
         result = source_text.replace(old_text, new_text)
         self.variables[result_var] = result
+
+    def handle_decipher(self, statement):
+        pattern = r'Decipher (\w+) with pattern "([^"]*)" into (\w+)(?: and (\w+))?'
+        match = re.match(pattern, statement, re.IGNORECASE)
+        if not match:
+            raise SyntaxError('use Decipher <variable> with pattern "<regex>" into <result1> [and <result2>...]')
+
+        source_var = match.group(1)
+        regex_pattern = match.group(2)
+        result_var1 = match.group(3)
+        result_var2 = match.group(4)  # This will be None if not specified
+
+        if source_var not in self.variables:
+            raise NameError(f"unknown entity {source_var}")
+
+        source_text = self.variables[source_var]
+        if not isinstance(source_text, str):
+            raise TypeError(f"{source_var} is not text")
+
+        # Apply regex pattern to extract components
+        regex_match = re.match(regex_pattern, source_text)
+        if not regex_match:
+            raise ValueError(f"Pattern did not match the text in {source_var}")
+
+        # Store the matched groups
+        if regex_match.groups():
+            if result_var2 and len(regex_match.groups()) >= 2:
+                self.variables[result_var1] = regex_match.group(1)
+                self.variables[result_var2] = regex_match.group(2)
+            else:
+                self.variables[result_var1] = regex_match.group(1)
+        else:
+            raise ValueError(f"Pattern did not capture any groups in {source_var}")
