@@ -1,27 +1,7 @@
 import pytest
-import os
-import tempfile
 
-from spellscript import SpellScriptInterpreter
+from conftest import incantation
 
-@pytest.fixture
-def interpreter():
-    return SpellScriptInterpreter()
-
-def incantation(details):
-    return f"begin the grimoire. {details} close the grimoire."
-
-@pytest.fixture
-def temp_text_file():
-    """Create a temporary text file for testing file reading."""
-    with tempfile.NamedTemporaryFile('w', delete=False) as f:
-        f.write("Line 1\nLine 2\nLine 3\nLine 4\nLine 5")
-        temp_file_path = f.name
-    
-    yield temp_file_path
-    
-    # Clean up the temporary file after test
-    os.unlink(temp_file_path)
 
 def test_reveal_knowledge(interpreter, temp_text_file):
     """Test reveal: read file contents into a variable"""
@@ -66,3 +46,25 @@ def test_transform_string(interpreter):
                       'inscribe new_incantation.')
     interpreter.parse_and_execute(spell)
     assert interpreter.variables["new_incantation"] == "Turn silver into gold"
+
+def test_decipher_single_group(interpreter):
+    """Test decipher: extract single capture group"""
+    spell = incantation('summon the text with essence of whispers of "Hello World". '
+                      'decipher text with pattern "(\\w+) \\w+" into first.')
+    interpreter.parse_and_execute(spell)
+    assert interpreter.variables["first"] == "Hello"
+
+def test_decipher_multiple_groups(interpreter):
+    """Test decipher: extract multiple capture groups"""
+    spell = incantation('summon the text with essence of whispers of "John:42". '
+                      'decipher text with pattern "(\\w+):(\\d+)" into name and age.')
+    interpreter.parse_and_execute(spell)
+    assert interpreter.variables["name"] == "John"
+    assert interpreter.variables["age"] == "42"
+
+def test_decipher_no_match(interpreter):
+    """Test decipher: pattern doesn't match"""
+    spell = incantation('summon the text with essence of whispers of "Hello". '
+                      'decipher text with pattern "(\\d+)" into num.')
+    with pytest.raises(ValueError):
+        interpreter.parse_and_execute(spell)

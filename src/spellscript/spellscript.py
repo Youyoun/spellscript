@@ -440,7 +440,7 @@ class SpellScriptInterpreter:
                 print(f"[{', '.join(str(v) for v in val)}]")
             else:
                 print(val)
-        except:
+        except Exception:
             print(msg)
 
     def handle_ponder(self, words):
@@ -556,61 +556,10 @@ class SpellScriptInterpreter:
         if not match:
             raise SyntaxError("use Invoke the ritual <name> with <args>")
         name, args_str = match.groups()
-        if name not in self.functions:
-            raise NameError(f"ritual {name} not found")
-        func = self.functions[name]
-        params = func["params"]
+        ritual_call = name
         if args_str:
-            args_raw = [a.strip() for a in args_str.split("and")]
-            args = []
-            arg_var_names = []
-
-            for arg in args_raw:
-                if arg in self.variables:
-                    arg_var_names.append(arg)
-                    args.append(self.variables[arg])
-                else:
-                    arg_var_names.append(None)
-                    args.append(self.evaluate_expression(arg))
-        else:
-            args = []
-            arg_var_names = []
-
-        if len(args) != len(params):
-            raise ValueError(f"ritual {name} expects {len(params)} args, got {len(args)}")
-
-        saved_param_values = {}
-        for p in params:
-            if p in self.variables:
-                saved_param_values[p] = self.variables[p]
-
-        for p, a in zip(params, args):
-            self.variables[p] = a
-
-        context = ExecutionContext(source='body', body_statements=func["body"], start_index=0)
-        self.context_stack.append(context)
-
-        result = None
-        while context.current_index < len(context.body_statements):
-            body_statement = context.body_statements[context.current_index]
-            context.current_index += 1
-            result = self.execute_statement(body_statement)
-            if result is not None:
-                break
-
-        self.context_stack.pop()
-
-        for i, (param, var_name) in enumerate(zip(params, arg_var_names)):
-            if var_name is not None and param in self.variables:
-                self.variables[var_name] = self.variables[param]
-
-        for p in params:
-            if p in saved_param_values:
-                self.variables[p] = saved_param_values[p]
-            else:
-                if p in self.variables:
-                    del self.variables[p]
-
+            ritual_call += " with " + args_str
+        result = self.evaluate_ritual_call(ritual_call)
         self.last_return_value = result
         return result
 
@@ -863,7 +812,7 @@ class SpellScriptInterpreter:
                 if not isinstance(a, (int, float)):
                     raise TypeError(f"Expected number, got {type(a).__name__}: {a}")
                 if not isinstance(b, (int, float)):
-                    raise TypeError(f"Expected number, got {type(a).__name__}: {b}")
+                    raise TypeError(f"Expected number, got {type(b).__name__}: {b}")
                 return a + b
 
         if "lesser by" in expr.lower():
@@ -874,7 +823,7 @@ class SpellScriptInterpreter:
                 if not isinstance(a, (int, float)):
                     raise TypeError(f"Expected number, got {type(a).__name__}: {a}")
                 if not isinstance(b, (int, float)):
-                    raise TypeError(f"Expected number, got {type(a).__name__}: {b}")
+                    raise TypeError(f"Expected number, got {type(b).__name__}: {b}")
                 return a - b
 
         if expr in self.variables:
@@ -980,15 +929,15 @@ class SpellScriptInterpreter:
         self.variables[result_var] = result
 
     def handle_decipher(self, statement):
-        pattern = r'Decipher (\w+) with pattern "([^"]*)" into (\w+)(?: and (\w+))?'
+        pattern = r'Decipher (\w+) with pattern "([^"]*)" into (.+)'
         match = re.match(pattern, statement, re.IGNORECASE)
         if not match:
             raise SyntaxError('use Decipher <variable> with pattern "<regex>" into <result1> [and <result2>...]')
 
         source_var = match.group(1)
         regex_pattern = match.group(2)
-        result_var1 = match.group(3)
-        result_var2 = match.group(4)  # This will be None if not specified
+        result_vars_str = match.group(3)
+        result_vars = [v.strip() for v in result_vars_str.split(" and ")]
 
         if source_var not in self.variables:
             raise NameError(f"unknown entity {source_var}")
@@ -997,17 +946,16 @@ class SpellScriptInterpreter:
         if not isinstance(source_text, str):
             raise TypeError(f"{source_var} is not text")
 
-        # Apply regex pattern to extract components
         regex_match = re.match(regex_pattern, source_text)
         if not regex_match:
             raise ValueError(f"Pattern did not match the text in {source_var}")
 
-        # Store the matched groups
-        if regex_match.groups():
-            if result_var2 and len(regex_match.groups()) >= 2:
-                self.variables[result_var1] = regex_match.group(1)
-                self.variables[result_var2] = regex_match.group(2)
-            else:
-                self.variables[result_var1] = regex_match.group(1)
-        else:
+        groups = regex_match.groups()
+        if not groups:
             raise ValueError(f"Pattern did not capture any groups in {source_var}")
+
+        if len(groups) < len(result_vars):
+            raise ValueError(f"Pattern captured {len(groups)} groups but {len(result_vars)} result variables were specified")
+
+        for var, value in zip(result_vars, groups):
+            self.variables[var] = value

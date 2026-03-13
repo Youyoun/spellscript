@@ -1,15 +1,6 @@
 import pytest
-import os
-import tempfile
 
-from spellscript import SpellScriptInterpreter
-
-@pytest.fixture
-def interpreter():
-    return SpellScriptInterpreter()
-
-def incantation(details):
-    return f"begin the grimoire. {details} close the grimoire."
+from conftest import incantation
 
 
 def test_inscribe(interpreter, capsys):
@@ -21,67 +12,15 @@ def test_inscribe(interpreter, capsys):
 
 def test_spell():
     """test that running spellscript on test.spell works"""
+    import os
+    from spellscript import SpellScriptInterpreter
     interpreter = SpellScriptInterpreter()
-    with open("test.spell") as f:
+    spell_path = os.path.join(os.path.dirname(__file__), "test.spell")
+    with open(spell_path) as f:
         interpreter.parse_and_execute(f.read())
 
-@pytest.fixture
-def temp_text_file():
-    """Create a temporary text file for testing file reading."""
-    with tempfile.NamedTemporaryFile('w', delete=False) as f:
-        f.write("Line 1\nLine 2\nLine 3\nLine 4\nLine 5")
-        temp_file_path = f.name
-    
-    yield temp_file_path
-    
-    # Clean up the temporary file after test
-    os.unlink(temp_file_path)
-
-def test_reveal_knowledge(interpreter, temp_text_file):
-    """Test reveal: read file contents into a variable"""
-    spell = incantation(f'reveal knowledge from "{temp_text_file}" into scroll. inscribe scroll.')
-    interpreter.parse_and_execute(spell)
-    assert interpreter.variables["scroll"] == "Line 1\nLine 2\nLine 3\nLine 4\nLine 5"
-
-def test_reveal_nonexistent_file(interpreter):
-    """Test reveal: handle non-existent file"""
-    spell = incantation('reveal knowledge from "nonexistent_file.txt" into scroll.')
-    with pytest.raises(FileNotFoundError):
-        interpreter.parse_and_execute(spell)
-
-def test_dissect_string(interpreter):
-    """Test dissect: split string by delimiter"""
-    spell = incantation('summon the words with essence of whispers of "apple,banana,cherry". '
-                        'dissect words by "," into fruits. '
-                        'inscribe fruits.')
-    interpreter.parse_and_execute(spell)
-    assert "words" in interpreter.variables
-    assert interpreter.variables["fruits"] == ["apple", "banana", "cherry"]
-
-def test_extract_verse(interpreter):
-    """Test extract: get specific line from multi-line text"""
-    spell = incantation('summon the poem with essence of whispers of "First line\nSecond line\nThird line". '
-                        'extract verse 2 from poem into second_line. '
-                        'inscribe second_line.')
-    interpreter.parse_and_execute(spell)
-    assert interpreter.variables["second_line"] == "Second line"
-
-def test_extract_verse_out_of_range(interpreter):
-    """Test extract: handle out of range line number"""
-    spell = incantation('summon the poem with essence of whispers of "Single line". '
-                        'extract verse 2 from poem into second_line.')
-    with pytest.raises(IndexError):
-        interpreter.parse_and_execute(spell)
-
-def test_transform_string(interpreter):
-    """Test transform: replace text in string"""
-    spell = incantation('summon the incantation with essence of whispers of "Turn lead into gold". '
-                        'transform incantation replacing "lead" with "silver" into new_incantation. '
-                        'inscribe new_incantation.')
-    interpreter.parse_and_execute(spell)
-    assert interpreter.variables["new_incantation"] == "Turn silver into gold"
-
-def test_run(interpreter):
+def test_ritual_with_conditionals(interpreter, capsys):
+    """Test ritual definition and invocation with conditional returns"""
     script = """
     begin the grimoire.
     conjure ritual named getgrade with score to begin:
@@ -90,11 +29,12 @@ def test_run(interpreter):
         if the signs show score greater than 70 then return whispers of "c".
         return whispers of "f".
     end ritual.
-    
+
     inscribe whispers of "95 = " bound with through ritual getgrade with 95.
     inscribe whispers of "75 = " bound with through ritual getgrade with 75.
     close the grimoire.
     """
     interpreter.parse_and_execute(script)
-    assert interpreter.variables["95"] == "a"
-    assert interpreter.variables["75"] == "b"
+    captured = capsys.readouterr()
+    assert "95 = a" in captured.out
+    assert "75 = c" in captured.out
