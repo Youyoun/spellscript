@@ -1,15 +1,25 @@
 begin the grimoire.
 
-conjure ritual named fibonacci with n to begin:
-    if the signs show n less than 2 then return n.
-    return through ritual fibonacci with n lesser by 1 greater by through ritual fibonacci with n lesser by 2.
+conjure ritual named fibonacci with rune to begin:
+    if the signs show rune less than 2 then return rune.
+    summon the shadow with essence of 0.
+    summon the flame with essence of 1.
+    summon the step with essence of 2.
+    repeat the incantation rune times to begin:
+        if the signs show step greater than rune then return flame.
+        summon the ember with essence of flame.
+        enchant flame with flame greater by shadow.
+        enchant shadow with ember.
+        enchant step with step greater by 1.
+    end loop.
+    return flame.
 end ritual.
 
 inscribe whispers of "Fibonacci sequence:".
-summon the idx with essence of 0.
+summon the imp with essence of 0.
 repeat the incantation 15 times to begin:
-    inscribe idx bound with whispers of ": " bound with through ritual fibonacci with idx.
-    enchant idx with idx greater by 1.
+    inscribe imp bound with whispers of ": " bound with through ritual fibonacci with imp.
+    enchant imp with imp greater by 1.
 end loop.
 
 close the grimoire.
